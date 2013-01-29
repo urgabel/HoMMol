@@ -4,6 +4,47 @@
         <name>HoMMol_core</name>
     </assembly>
     <members>
+        <member name="T:HoMMol_core.IO.Matr">
+            <summary>Materials list, used in Mesh files</summary>
+        </member>
+        <member name="F:HoMMol_core.IO.Matr.Id">
+            <summary>Identifier name, can be in chinese</summary>
+        </member>
+        <member name="F:HoMMol_core.IO.Matr.Diffuse">
+            <summary>Diffuse color RGBA</summary>
+        </member>
+        <member name="F:HoMMol_core.IO.Matr.Ambient">
+            <summary>Ambient color RGB</summary>
+        </member>
+        <member name="F:HoMMol_core.IO.Matr.Specular">
+            <summary>Specular 'shininess'</summary>
+        </member>
+        <member name="F:HoMMol_core.IO.Matr.Emissive">
+            <summary>Emissive color RGB</summary>
+        </member>
+        <member name="F:HoMMol_core.IO.Matr.Power">
+            <summary>Sharpness if specular highlight</summary>
+        </member>
+        <member name="M:HoMMol_core.IO.Matr.#ctor">
+            <summary>New default Material</summary>
+        </member>
+        <member name="M:HoMMol_core.IO.Matr.#ctor(System.String,HoMMol_core.D3DColor,HoMMol_core.D3DColor,HoMMol_core.D3DColor,HoMMol_core.D3DColor,System.Single)">
+            <summary>New Material from provided fields</summary>
+        </member>
+        <member name="M:HoMMol_core.IO.Matr.#ctor(System.String)">
+            <summary>New Material from a string, like in Matr ini file</summary>
+        </member>
+        <member name="M:HoMMol_core.IO.Matr.#ctor(System.Byte[])">
+            <summary>New Material from a byte array, like in Matr dbc file</summary>
+        </member>
+        <member name="M:HoMMol_core.IO.Matr.ToString">
+            <summary>Get the material in string format</summary>
+            <returns>a string, as stored in Matr ini file</returns>
+        </member>
+        <member name="M:HoMMol_core.IO.Matr.ToBytes">
+            <summary>Get the material in a byte array</summary>
+            <returns>a 52 bytes array, as stored in Matr dbc file</returns>
+        </member>
         <member name="T:HoMMol_core.Crypto.HashNames">
             Static class to handle hashnames from everywhere
         </member>
@@ -15,6 +56,143 @@
             <paramref name="str">String to convert into hash Id</paramref>
             <returns>a 32 bits unique Id</returns>
             </summary>
+        </member>
+        <member name="T:HoMMol_core.IO.Mesh">
+            <summary>Handles Mesh structures
+            <para>Mesh is a net of interlaced wires, a collection of linked</para>
+            <para> vertex, used to represent a 3D surface.</para>
+            <para>Files using this class (either in dbc or ini format):</para>
+            <para> armet.dbc  armor.dbc  Earrings.dbc  hair.dbc   head.dbc</para>
+            <para> misc.dbc   mount.dbc  necklace.dbc  skirt.dbc  weapon.dbc</para>
+            </summary>
+        </member>
+        <member name="F:HoMMol_core.IO.Mesh.MAGIC_TYPE_TXT">
+            <summary>MAGIC_TYPE_TXT</summary>
+            <value>Binary files header, in text format</value>
+        </member>
+        <member name="F:HoMMol_core.IO.Mesh.MAGIC_TYPE_BIN">
+            <summary>MAGIC_TYPE_BIN</summary>
+            <value>Binary files header, in binary format</value>
+        </member>
+        <member name="F:HoMMol_core.IO.Mesh.MAX_MESH_PARTS">
+            <summary>MAX_MESH_PARTS</summary>
+            <value>Any Role Part can have upto 4 meshes at most</value>
+        </member>
+        <member name="F:HoMMol_core.IO.Mesh.Id">
+            <summary>Id</summary>
+            <value>Mesh Id, in 3DObj.ini</value>
+        </member>
+        <member name="F:HoMMol_core.IO.Mesh.Texture">
+            <summary>Texture</summary>
+            <value>Texture Id, in 3DTexture.ini</value>
+        </member>
+        <member name="F:HoMMol_core.IO.Mesh.MixTex">
+            <summary>MixTex</summary>
+            <value>Secondary Texture Id to mix, in 3DTexture.ini, when using more than one</value>
+        </member>
+        <member name="F:HoMMol_core.IO.Mesh.MixOpt">
+            <summary>MixOpt</summary>
+            <value>Mixing options, <seealso cref="F:HoMMol_core.IO.Mesh.MixOpt">check possible options</seealso></value>
+        </member>
+        <member name="F:HoMMol_core.IO.Mesh.Asb">
+            <summary>Asb</summary>
+            <value>Alfa Source Blend</value>
+        </member>
+        <member name="F:HoMMol_core.IO.Mesh.Adb">
+            <summary>Adb</summary>
+            <value>Alfa Destination Blend</value>
+        </member>
+        <member name="F:HoMMol_core.IO.Mesh.Material">
+            <summary>Material</summary>
+            <value>Material Id, in Material.ini; <seealso cref="F:HoMMol_core.IO.Mesh.Material">check possible options</seealso></value>
+        </member>
+        <member name="M:HoMMol_core.IO.Mesh.#ctor">
+            <summary>New default empty Mesh</summary>
+        </member>
+        <member name="M:HoMMol_core.IO.Mesh.#ctor(System.UInt32,System.UInt32,System.UInt32,System.Byte,System.Byte,System.Byte,System.Byte)">
+            <summary>New Mesh from provided fields</summary>
+        </member>
+        <member name="M:HoMMol_core.IO.Mesh.#ctor(System.Byte[])">
+            <summary>New Mesh from byte array, as in dbc Mesh file</summary>
+        </member>
+        <member name="M:HoMMol_core.IO.Mesh.#ctor(System.String[])">
+            <summary>TODO: New Mesh from string array, as in ini files</summary>
+        </member>
+        <member name="M:HoMMol_core.IO.Mesh.Type">
+            <summary>Type of the class</summary>
+            <returns>Return "MESH"</returns>
+        </member>
+        <member name="M:HoMMol_core.IO.Mesh.Equals(HoMMol_core.IO.Mesh)">
+            <summary>Check if provided instance has the same values</summary>
+            <returns>Return true if same values</returns>
+        </member>
+        <member name="M:HoMMol_core.IO.Mesh.Equal_Id(System.UInt32)">
+            <summary>Check if provided instance has the same Id</summary>
+            <returns>Return true if same Id</returns>
+        </member>
+        <member name="M:HoMMol_core.IO.Mesh.ToString">
+            <summary>Parse to String without index</summary>
+            <returns>Return a string ready to save to an ini file</returns>
+        </member>
+        <member name="M:HoMMol_core.IO.Mesh.ToString(System.UInt32)">
+            <summary>Parse to a String with an index in each field</summary>
+            <returns>Return a string ready to save to an ini file</returns>
+        </member>
+        <member name="M:HoMMol_core.IO.Mesh.ToBytes">
+            <summary>Parse to array of bytes</summary>
+            <returns>Return an array of bytes ready to save to a dbc file</returns>
+        </member>
+        <member name="T:HoMMol_core.Common">
+            <summary>Shared variables and methods in the whole project</summary>
+        </member>
+        <member name="F:HoMMol_core.Common.enc">
+            <summary>enc can be used from everywhere
+            <para>"GB18030" = Page Code 54936: Simplified Chinese</para>
+            </summary>
+        </member>
+        <member name="M:HoMMol_core.Common.Bytes32ToString(System.Byte[])">
+            <summary>Parse a 32 bytes array to string</summary>
+            <returns>a string without '\0' chars at the end</returns>
+        </member>
+        <member name="M:HoMMol_core.Common.StringToBytes32(System.String)">
+            <summary>Parse a string to a 32 bytes array</summary>
+            <returns>a 32 bytes lenght string, adding '\0' chars at the end</returns>
+        </member>
+        <member name="T:HoMMol_core.D3DColor">
+            <summary>A 4 components color value (ARGB)</summary>
+        </member>
+        <member name="F:HoMMol_core.D3DColor.Alpha">
+            <summary>Alpha channel value, for transparency.</summary>
+        </member>
+        <member name="F:HoMMol_core.D3DColor.Red">
+            <summary>Red channel value.</summary>
+        </member>
+        <member name="F:HoMMol_core.D3DColor.Green">
+            <summary>Green Channel value.</summary>
+        </member>
+        <member name="F:HoMMol_core.D3DColor.Blue">
+            <summary>Blue Channel value.</summary>
+        </member>
+        <member name="M:HoMMol_core.D3DColor.#ctor">
+            <summary>New default instance</summary>
+        </member>
+        <member name="M:HoMMol_core.D3DColor.#ctor(System.Byte,System.Byte,System.Byte,System.Byte)">
+            <summary>New instance from provided fields</summary>
+        </member>
+        <member name="M:HoMMol_core.D3DColor.#ctor(System.UInt32)">
+            <summary>New instance from a 32 bits value, as stored in Matr dbc file</summary>
+        </member>
+        <member name="M:HoMMol_core.D3DColor.ToBytes">
+            <summary>Get the color in a Byte array format</summary>
+            <returns>a 4 bytes buffer array, as stored in Matr dbc file</returns>
+        </member>
+        <member name="M:HoMMol_core.D3DColor.ToUInt32">
+            <summary>Get the color in UInt32 format</summary>
+            <returns>a 32 bits value, as stored in Matr dbc file</returns>
+        </member>
+        <member name="M:HoMMol_core.D3DColor.ToString">
+            <summary>Get the color in string format</summary>
+            <returns>a 8 chars lenght string, as stored in Matr ini file</returns>
         </member>
     </members>
 </doc>
