@@ -12,8 +12,8 @@ namespace HoMMol_core.Crypto
         /// <para>Adapted from WindSoul Game Engine source code</para>
         /// <para>Function: unsigned long string_id(const char *str)</para>
         /// <para>http://read.pudn.com/downloads76/sourcecode/game/281928/%E9%A3%8E%E9%AD%82/wdfpck.cpp__.htm</para>
-        /// <param name="str">String to convert into hash Id</param>
-        /// <returns>Returns a 32 bits unique Id</returns>
+        /// <paramref name="str">String to convert into hash Id</paramref>
+        /// <returns>a 32 bits unique Id</returns>
         /// </summary>
         public static UInt32 String2Id(string str)
         {
@@ -36,8 +36,8 @@ namespace HoMMol_core.Crypto
             UInt64 high, op_1, op_2;                // To handle 64bits numbers
 
             // Replace '\\' to '/' and all letters to lowercase
-            str = str.ToLowerInvariant();
             str = str.Replace('\\', '/');
+            str = str.ToLowerInvariant();
 
             // Create an array (m) of unsigned int to store the string
             ASCIIEncoding enc = new ASCIIEncoding();    // Use ASCII to get unchanged bytes
@@ -48,12 +48,12 @@ namespace HoMMol_core.Crypto
             by = enc.GetBytes(str);
             Buffer.BlockCopy(by, 0, m, 0, str.Length);
 
-            // Check the lenght of m used by str and add 2 values to the end
+            // Check the lenght of m, actually used by str and add 2 values to the end
             for (length = 0; length < 64 && m[length] != 0; length++) ; // length appoint to the last integer not zero in the m array 
             m[length++] = ADD_1;
             m[length++] = ADD_2;
 
-            // With each int from the string
+            // With each int from the string perform several operations
             for (int i = 0; i < length; i++)
             {
                 // Rotate left v 1 bit for each 32bits m[i]
@@ -91,7 +91,8 @@ namespace HoMMol_core.Crypto
             }
 
             // Mask x with y and return the result
-            return x ^ y;
+            UInt32 Id = x ^ y;
+            return Id;
         }
     }
 }

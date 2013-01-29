@@ -1,0 +1,20 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>HoMMol_core</name>
+    </assembly>
+    <members>
+        <member name="T:HoMMol_core.Crypto.HashNames">
+            Static class to handle hashnames from everywhere
+        </member>
+        <member name="M:HoMMol_core.Crypto.HashNames.String2Id(System.String)">
+            <summary>Get the hash number Id from a full path+filename
+            <para>Adapted from WindSoul Game Engine source code</para>
+            <para>Function: unsigned long string_id(const char *str)</para>
+            <para>http://read.pudn.com/downloads76/sourcecode/game/281928/%E9%A3%8E%E9%AD%82/wdfpck.cpp__.htm</para>
+            <paramref name="str">String to convert into hash Id</paramref>
+            <returns>a 32 bits unique Id</returns>
+            </summary>
+        </member>
+    </members>
+</doc>
