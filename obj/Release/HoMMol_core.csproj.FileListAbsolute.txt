@@ -1,0 +1,6 @@
+D:\Documents and Settings\Administrador\HoMMol\bin\Release\HoMMol_core.dll
+D:\Documents and Settings\Administrador\HoMMol\bin\Release\HoMMol_core.pdb
+D:\Documents and Settings\Administrador\HoMMol\obj\Release\ResolveAssemblyReference.cache
+D:\Documents and Settings\Administrador\HoMMol\obj\Release\HoMMol_core.dll
+D:\Documents and Settings\Administrador\HoMMol\obj\Release\HoMMol_core.pdb
+D:\Documents and Settings\Administrador\HoMMol\bin\Release\HoMMol_core.dll.config
