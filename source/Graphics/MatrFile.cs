@@ -24,6 +24,8 @@ namespace HoMMol_core.source.IO
         public Dictionary<String, Matr> Data = null;
         /// <summary>Amount of data entries</summary>
         public UInt32 Amount = 0;
+        /// <summary>Stores initial comments, if any</summary>
+        public String InitialComments = null;
         #endregion
 
         #region Constructor
@@ -43,9 +45,12 @@ namespace HoMMol_core.source.IO
         /// <param name="fs">FileStream to read from</param>
         /// <param name="mode">BIN or TXT, for binary dbc or text ini</param>
         /// <returns>False if error loading the data</returns>
+        /// <exception cref="Exception">If cannot find the header</exception>
+        // TODO: Add support for long comments "/* [...] */"
         public Boolean Load(UInt32 amount, FileStream fs, dbcFile.Mode mode)
         {
             Boolean result = false;
+            Boolean headerIsSet = false;
             fs.Seek(0, SeekOrigin.Begin);
             switch (mode)
             {
@@ -65,17 +70,38 @@ namespace HoMMol_core.source.IO
                                 if (line.Length > 0)    //skip empty lines
                                 {
                                     // Store comments to add after created a new Matr
-                                    if (line.Length > 1 && line.Substring(0,2) == "//")
+                                    if (line.Length > 1 && line.Substring(0,2) == "//"
+                                        | line.Substring(0,1) == ";")
                                     {
                                         hasComments = true;
                                         if (String.IsNullOrEmpty(Comments))
                                             Comments = line;
                                         else
-                                            Comments += line;
+                                            Comments += "\r\n" + line;
                                     }
                                     else
                                     {
-                                        try
+                                        if (!headerIsSet)
+                                        {
+                                            if (hasComments)
+                                            {
+                                                InitialComments = Comments;
+                                                hasComments = false;
+                                                Comments = String.Empty;
+                                            }
+                                            if (line.Length > 9 
+                                                && line.Substring(0, 9) == "Material="
+                                                && UInt32.TryParse(line.Substring(9), out Amount))
+                                            {
+                                                // OK
+                                            }
+                                            else
+                                            {
+                                                // Bad format
+                                                throw new Exception("Cannot find the header; expected: Material=##");
+                                            }
+                                        }
+                                        else try
                                         {
                                             Matr m = new Matr(line);
                                             if (hasComments) m.AddComments(Comments);
@@ -86,6 +112,7 @@ namespace HoMMol_core.source.IO
                                         catch
                                         {
                                             // Skip lines with incorrect format
+                                            //Trace.Warning("Skiped line " + lineCount + " with incorrect format.");
                                         }
                                     }
                                 }
@@ -100,7 +127,8 @@ namespace HoMMol_core.source.IO
                         {
                             UInt32 bytesRead = 0;   // Only for debug
                             Byte[] buffer = new Byte[52];
-                            br.Read(buffer, 0, 8);   // Skip Magic Header and amount
+                            br.Read(buffer, 0, 8);  // Skip Magic Header and amount
+                                                    //   as it is already known
                             bytesRead += 8;
                             // Read all data, 52 bytes each
                             for (int i = 0; i < amount; i++)
