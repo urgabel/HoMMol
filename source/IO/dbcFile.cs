@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace HoMMol_core.source.IO
+namespace HoMMol_core.IO
 {
     /// <summary>Dbc files are DataBase files stored in Client side
     ///   It can be: Mesh, Rsdb (32 or 64 bits), Effe, Simo, 
@@ -24,12 +24,14 @@ namespace HoMMol_core.source.IO
         #region Constants
         /// <summary>Mode to handle dbc files, in read or write operations</summary>
         public enum Mode { BIN, TXT }
+
         /// <summary>Magyc Type Header in dbc binary files, in String format</summary>
         public static String[] DBC_HEADERS_TXT = 
             {
                 "MESH", "RSDB", "EFFE", "SIMO", 
                 "SIMX", "EMOI", "MATR", "ROPT"
             };
+
         /// <summary>Magyc Type Header in dbc binary files, in UInt32 format</summary>
         public static UInt32[] DBC_HEADERS_BIN =
             {
@@ -48,16 +50,17 @@ namespace HoMMol_core.source.IO
         #region Properties
         /// <summary>Amount of data entries</summary>
         public UInt32 Amount = 0;
-        private UInt32 _DbcMagicType = 0;
-        private Boolean _IsBinary = true;
-        private String _DbcType = null;
-        private String _FileName = null;
-        private FileStream _fs = null;
-        private long _fs_size = 0;
-        private FileStream _dfs = null;
-        private StreamReader _sr = null;
-        private StreamWriter _sw = null;
-        private MatrFile _Matr = null;
+
+        private UInt32 _DbcMagicType = 0;   // Dbc Magic type in binary form
+        private Boolean _IsBinary = true;   // True if Dbc is in binary form
+        private String _DbcType = null;     // Type of Dbc (MATR, MESH...)
+        private String _FileName = null;    // Dbc Filename
+        private FileStream _fs = null;      // Source Filestream
+        private long _fs_size = 0;          // Size of the source
+        private FileStream _dfs = null;     // Destination Filestream
+        private StreamReader _sr = null;    // For text read operations
+        private StreamWriter _sw = null;    // For text write operations
+        private MatrFile _Matr = null;      // Stores all data
         #endregion
 
         #region Constructor
