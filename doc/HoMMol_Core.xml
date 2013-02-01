@@ -4,46 +4,197 @@
         <name>HoMMol_core</name>
     </assembly>
     <members>
-        <member name="T:HoMMol_core.IO.Matr">
-            <summary>Materials list, used in Mesh files</summary>
+        <member name="T:HoMMol_core.Graphics.ModelPart">
+            <summary>Handles Mesh structures
+            <para>Mesh is a net of interlaced wires, a collection of linked 
+            vertex, used to represent a 3D surface.</para>
+            <para>Files using this class (either in dbc or ini format):</para>
+            <para> armet.dbc  armor.dbc  Earrings.dbc  hair.dbc   head.dbc</para>
+            <para> misc.dbc   mount.dbc  necklace.dbc  skirt.dbc  weapon.dbc</para>
+            </summary>
         </member>
-        <member name="F:HoMMol_core.IO.Matr.Id">
-            <summary>Identifier name, can be in chinese</summary>
+        <member name="F:HoMMol_core.Graphics.ModelPart.MAGIC_TYPE_TXT">
+            <summary>MAGIC_TYPE_TXT</summary>
+            <value>Binary files header, in text format</value>
         </member>
-        <member name="F:HoMMol_core.IO.Matr.Diffuse">
-            <summary>Diffuse color RGBA</summary>
+        <member name="F:HoMMol_core.Graphics.ModelPart.MAGIC_TYPE_BIN">
+            <summary>MAGIC_TYPE_BIN</summary>
+            <value>Binary files header, in binary format</value>
         </member>
-        <member name="F:HoMMol_core.IO.Matr.Ambient">
-            <summary>Ambient color RGB</summary>
+        <member name="F:HoMMol_core.Graphics.ModelPart.MAX_MESH_PARTS">
+            <summary>MAX_MESH_PARTS</summary>
+            <value>Any Role Part can have upto 4 meshes at most</value>
         </member>
-        <member name="F:HoMMol_core.IO.Matr.Specular">
-            <summary>Specular 'shininess'</summary>
+        <member name="F:HoMMol_core.Graphics.ModelPart.Mesh">
+            <summary>Texture</summary>
+            <value>Mesh Id, in 3DObj.ini</value>
         </member>
-        <member name="F:HoMMol_core.IO.Matr.Emissive">
-            <summary>Emissive color RGB</summary>
+        <member name="F:HoMMol_core.Graphics.ModelPart.Texture">
+            <summary>Texture</summary>
+            <value>Texture Id, in 3DTexture.ini</value>
         </member>
-        <member name="F:HoMMol_core.IO.Matr.Power">
-            <summary>Sharpness if specular highlight</summary>
+        <member name="F:HoMMol_core.Graphics.ModelPart.MixTex">
+            <summary>MixTex</summary>
+            <value>Secondary Texture Id to mix, in 3DTexture.ini, 
+            when using more than one</value>
         </member>
-        <member name="M:HoMMol_core.IO.Matr.#ctor">
-            <summary>New default Material</summary>
+        <member name="F:HoMMol_core.Graphics.ModelPart.MixOpt">
+            <summary>MixOpt</summary>
+            <value>Mixing options, 
+            <seealso cref="F:HoMMol_core.Graphics.ModelPart.MixOpt">check possible options</seealso></value>
         </member>
-        <member name="M:HoMMol_core.IO.Matr.#ctor(System.String,HoMMol_core.D3DColor,HoMMol_core.D3DColor,HoMMol_core.D3DColor,HoMMol_core.D3DColor,System.Single)">
-            <summary>New Material from provided fields</summary>
+        <member name="F:HoMMol_core.Graphics.ModelPart.Asb">
+            <summary>Asb</summary>
+            <value>Alfa Source Blend
+            <seealso cref="T:HoMMol_core.Graphics.D3DBLEND">check possible options</seealso></value>
         </member>
-        <member name="M:HoMMol_core.IO.Matr.#ctor(System.String)">
-            <summary>New Material from a string, like in Matr ini file</summary>
+        <member name="F:HoMMol_core.Graphics.ModelPart.Adb">
+            <summary>Adb</summary>
+            <value>Alfa Destination Blend
+            <seealso cref="T:HoMMol_core.Graphics.D3DBLEND">check possible options</seealso></value>
         </member>
-        <member name="M:HoMMol_core.IO.Matr.#ctor(System.Byte[])">
-            <summary>New Material from a byte array, like in Matr dbc file</summary>
+        <member name="F:HoMMol_core.Graphics.ModelPart.Material">
+            <summary>Material</summary>
+            <remarks>If reading binary Mesh file, it is needed to check 
+            Materials.ini to pass here the name (chinese encoded)</remarks>
+            <value>Material Id name, in Material.ini</value>
         </member>
-        <member name="M:HoMMol_core.IO.Matr.ToString">
-            <summary>Get the material in string format</summary>
-            <returns>a string, as stored in Matr ini file</returns>
+        <member name="M:HoMMol_core.Graphics.ModelPart.#ctor">
+            <summary>New default empty Mesh</summary>
         </member>
-        <member name="M:HoMMol_core.IO.Matr.ToBytes">
-            <summary>Get the material in a byte array</summary>
-            <returns>a 52 bytes array, as stored in Matr dbc file</returns>
+        <member name="M:HoMMol_core.Graphics.ModelPart.#ctor(System.UInt32,System.UInt32,System.UInt32,System.Byte,System.Byte,System.Byte,System.String)">
+            <summary>New Mesh from provided fields</summary>
+            <param name="M">Mesh Id, in 3DObj.ini</param>
+            <param name="T">Texture Id, in 3DTexture.ini</param>
+            <param name="MT">MixTex, 2nd texture to mix with</param>
+            <param name="MO">MixOpt, mixing options
+            <seealso cref="F:HoMMol_core.Graphics.ModelPart.MixOpt">check possible options</seealso></param>
+            <param name="As">Asb, Alpha Source Blending mode
+            <seealso cref="T:HoMMol_core.Graphics.D3DBLEND">check possible options</seealso></param>
+            <param name="Ad">Adb, Alpha Destination Blending mode
+            <seealso cref="T:HoMMol_core.Graphics.D3DBLEND">check possible options</seealso></param>
+            <param name="Mat">Material Id name, in Material.ini</param>
+        </member>
+        <member name="M:HoMMol_core.Graphics.ModelPart.#ctor(System.Byte[])">
+            <summary>New Mesh from byte array, as in dbc Mesh file
+            <remarks>For material it will be used "Material##", check 
+            <see cref="M:HoMMol_core.Graphics.ModelPart.#ctor(System.Byte[],System.String)"/>
+            </remarks></summary>
+            <param name="buffer">Data read from binary dbc file</param>
+        </member>
+        <member name="M:HoMMol_core.Graphics.ModelPart.#ctor(System.Byte[],System.String)">
+            <summary>New Mesh from byte array, as in dbc Mesh file
+            <remarks>For material it will be used "Material##"</remarks></summary>
+            <param name="buffer">Data read from binary dbc file</param>
+            <param name="material">Material Id name, in Material.ini</param>
+        </member>
+        <member name="M:HoMMol_core.Graphics.ModelPart.#ctor(System.String)">
+            <summary>New Mesh from multiline string</summary>
+            <param name="str">Lines separated by \r\n, like with this.ToString()</param>
+        </member>
+        <member name="M:HoMMol_core.Graphics.ModelPart.#ctor(System.String[])">
+            <summary>TODO: New Mesh from string array, as in ini files
+            <remarks>Material name must be read from Material.ini</remarks></summary>
+            <param name="str">Array of strings, one for each line</param>
+        </member>
+        <member name="M:HoMMol_core.Graphics.ModelPart.Type">
+            <summary>Type of the class</summary>
+            <returns>Return "MESH"</returns>
+        </member>
+        <member name="M:HoMMol_core.Graphics.ModelPart.Equals(HoMMol_core.Graphics.ModelPart)">
+            <summary>Check if provided instance has the same values</summary>
+            <returns>Return true if same values</returns>
+        </member>
+        <member name="M:HoMMol_core.Graphics.ModelPart.ToString">
+            <summary>Parse to String without index</summary>
+            <returns>Return a string ready to save to an ini file</returns>
+        </member>
+        <member name="M:HoMMol_core.Graphics.ModelPart.ToString(System.UInt32)">
+            <summary>Parse to a String with an index in each field</summary>
+            <returns>Return a string ready to save to an ini file</returns>
+        </member>
+        <member name="M:HoMMol_core.Graphics.ModelPart.ToBytes">
+            <summary>Parse to array of bytes
+            <remarks>This class does not read Material.ini file, so this 
+            method check if Material Id name is in the form "Material##" 
+            to use the number, or a zero otherwise. 
+            <see cref="M:HoMMol_core.Graphics.ModelPart.ToBytes(System.Byte)"/></remarks>
+            </summary>
+            <returns>Return an array of bytes ready to save to a dbc file</returns>
+        </member>
+        <member name="M:HoMMol_core.Graphics.ModelPart.ToBytes(System.Byte)">
+            <summary>Parse to array of bytes</summary>
+            <param name="material">Material Id order number, in Material.ini</param>
+            <returns>Return an array of bytes ready to save to a dbc file</returns>
+        </member>
+        <member name="T:HoMMol_core.IO.dbcFile">
+            <summary>Dbc files are DataBase files stored in Client side
+              It can be: Mesh, Rsdb (32 or 64 bits), Effe, Simo, 
+              SimX, Emoi, Matr, Ropt
+            Mesh -> 3D Wire
+            Rsdb -> Resource-Strings DataBase
+            Effe -> 3D Effects
+            Simo -> 3D Simple Object
+            SimX -> 3D Simple Object eXtension
+            Emoi -> Emotion Icon
+            Matr -> Material
+            Ropt -> Role Parts
+            <remarks>//TODO: Add new constructors to create and edit files</remarks>
+            </summary>
+        </member>
+        <member name="F:HoMMol_core.IO.dbcFile.DBC_HEADERS_TXT">
+            <summary>Magyc Type Header in dbc binary files, in String format</summary>
+        </member>
+        <member name="F:HoMMol_core.IO.dbcFile.DBC_HEADERS_BIN">
+            <summary>Magyc Type Header in dbc binary files, in UInt32 format</summary>
+        </member>
+        <member name="F:HoMMol_core.IO.dbcFile.Amount">
+            <summary>Amount of data entries</summary>
+        </member>
+        <member name="M:HoMMol_core.IO.dbcFile.#ctor(System.String)">
+            <summary>Open a dbc file to read data</summary>
+            <param name="fileName">Full path to the file</param>
+            <exception cref="T:System.Exception">If unsuported type of DBC file</exception>
+            <exception cref="T:System.IO.FileNotFoundException">If the file does not exists</exception>
+        </member>
+        <member name="M:HoMMol_core.IO.dbcFile.Close">
+            <summary>Close any opened file
+            <remarks>Keeps the data</remarks>
+            </summary>
+        </member>
+        <member name="M:HoMMol_core.IO.dbcFile.IsBinary">
+            <summary>Check if a dbc instance is in binary format
+            <remarks>Use first the constructor</remarks>
+            </summary>
+            <returns>False if text format (.ini)</returns>
+        </member>
+        <member name="M:HoMMol_core.IO.dbcFile.IsEmpty">
+            <summary>Check if a dbc instance has no data
+            <remarks>Use first the constructor</remarks>
+            </summary>
+            <returns>False if amount not 0</returns>
+        </member>
+        <member name="M:HoMMol_core.IO.dbcFile.DbcType">
+            <summary>Check the type of a dbc instance
+            <remarks>Use first the constructor</remarks>
+            </summary>
+            <returns>A string with Magic Type</returns>
+        </member>
+        <member name="M:HoMMol_core.IO.dbcFile.Load(HoMMol_core.IO.dbcFile.Mode)">
+            <summary>Load a dbc file
+            <remarks>Use first the constructor</remarks>
+            </summary>
+            <param name="m">Mode can be Mode.BIN or MODE.TXT</param>
+            <returns>False if error loading the file</returns>
+        </member>
+        <member name="M:HoMMol_core.IO.dbcFile.Save(System.String,HoMMol_core.IO.dbcFile.Mode)">
+            <summary>Save to a dbc file</summary>
+            <param name="fileName">Full path to the file</param>
+            <param name="m">Mode can be Mode.BIN or MODE.TXT</param>
+            <returns>False if error saving the file</returns>
+        </member>
+        <member name="T:HoMMol_core.IO.dbcFile.Mode">
+            <summary>Mode to handle dbc files, in read or write operations</summary>
         </member>
         <member name="T:HoMMol_core.Crypto.HashNames">
             Static class to handle hashnames from everywhere
@@ -56,91 +207,6 @@
             <paramref name="str">String to convert into hash Id</paramref>
             <returns>a 32 bits unique Id</returns>
             </summary>
-        </member>
-        <member name="T:HoMMol_core.IO.Mesh">
-            <summary>Handles Mesh structures
-            <para>Mesh is a net of interlaced wires, a collection of linked</para>
-            <para> vertex, used to represent a 3D surface.</para>
-            <para>Files using this class (either in dbc or ini format):</para>
-            <para> armet.dbc  armor.dbc  Earrings.dbc  hair.dbc   head.dbc</para>
-            <para> misc.dbc   mount.dbc  necklace.dbc  skirt.dbc  weapon.dbc</para>
-            </summary>
-        </member>
-        <member name="F:HoMMol_core.IO.Mesh.MAGIC_TYPE_TXT">
-            <summary>MAGIC_TYPE_TXT</summary>
-            <value>Binary files header, in text format</value>
-        </member>
-        <member name="F:HoMMol_core.IO.Mesh.MAGIC_TYPE_BIN">
-            <summary>MAGIC_TYPE_BIN</summary>
-            <value>Binary files header, in binary format</value>
-        </member>
-        <member name="F:HoMMol_core.IO.Mesh.MAX_MESH_PARTS">
-            <summary>MAX_MESH_PARTS</summary>
-            <value>Any Role Part can have upto 4 meshes at most</value>
-        </member>
-        <member name="F:HoMMol_core.IO.Mesh.Id">
-            <summary>Id</summary>
-            <value>Mesh Id, in 3DObj.ini</value>
-        </member>
-        <member name="F:HoMMol_core.IO.Mesh.Texture">
-            <summary>Texture</summary>
-            <value>Texture Id, in 3DTexture.ini</value>
-        </member>
-        <member name="F:HoMMol_core.IO.Mesh.MixTex">
-            <summary>MixTex</summary>
-            <value>Secondary Texture Id to mix, in 3DTexture.ini, when using more than one</value>
-        </member>
-        <member name="F:HoMMol_core.IO.Mesh.MixOpt">
-            <summary>MixOpt</summary>
-            <value>Mixing options, <seealso cref="F:HoMMol_core.IO.Mesh.MixOpt">check possible options</seealso></value>
-        </member>
-        <member name="F:HoMMol_core.IO.Mesh.Asb">
-            <summary>Asb</summary>
-            <value>Alfa Source Blend</value>
-        </member>
-        <member name="F:HoMMol_core.IO.Mesh.Adb">
-            <summary>Adb</summary>
-            <value>Alfa Destination Blend</value>
-        </member>
-        <member name="F:HoMMol_core.IO.Mesh.Material">
-            <summary>Material</summary>
-            <value>Material Id, in Material.ini; <seealso cref="F:HoMMol_core.IO.Mesh.Material">check possible options</seealso></value>
-        </member>
-        <member name="M:HoMMol_core.IO.Mesh.#ctor">
-            <summary>New default empty Mesh</summary>
-        </member>
-        <member name="M:HoMMol_core.IO.Mesh.#ctor(System.UInt32,System.UInt32,System.UInt32,System.Byte,System.Byte,System.Byte,System.Byte)">
-            <summary>New Mesh from provided fields</summary>
-        </member>
-        <member name="M:HoMMol_core.IO.Mesh.#ctor(System.Byte[])">
-            <summary>New Mesh from byte array, as in dbc Mesh file</summary>
-        </member>
-        <member name="M:HoMMol_core.IO.Mesh.#ctor(System.String[])">
-            <summary>TODO: New Mesh from string array, as in ini files</summary>
-        </member>
-        <member name="M:HoMMol_core.IO.Mesh.Type">
-            <summary>Type of the class</summary>
-            <returns>Return "MESH"</returns>
-        </member>
-        <member name="M:HoMMol_core.IO.Mesh.Equals(HoMMol_core.IO.Mesh)">
-            <summary>Check if provided instance has the same values</summary>
-            <returns>Return true if same values</returns>
-        </member>
-        <member name="M:HoMMol_core.IO.Mesh.Equal_Id(System.UInt32)">
-            <summary>Check if provided instance has the same Id</summary>
-            <returns>Return true if same Id</returns>
-        </member>
-        <member name="M:HoMMol_core.IO.Mesh.ToString">
-            <summary>Parse to String without index</summary>
-            <returns>Return a string ready to save to an ini file</returns>
-        </member>
-        <member name="M:HoMMol_core.IO.Mesh.ToString(System.UInt32)">
-            <summary>Parse to a String with an index in each field</summary>
-            <returns>Return a string ready to save to an ini file</returns>
-        </member>
-        <member name="M:HoMMol_core.IO.Mesh.ToBytes">
-            <summary>Parse to array of bytes</summary>
-            <returns>Return an array of bytes ready to save to a dbc file</returns>
         </member>
         <member name="T:HoMMol_core.Common">
             <summary>Shared variables and methods in the whole project</summary>
@@ -158,39 +224,185 @@
             <summary>Parse a string to a 32 bytes array</summary>
             <returns>a 32 bytes lenght string, adding '\0' chars at the end</returns>
         </member>
-        <member name="T:HoMMol_core.D3DColor">
+        <member name="F:HoMMol_core.Common.lineSplit">
+            <summary>Text line separators</summary>
+        </member>
+        <member name="M:HoMMol_core.Common.SplitLines(System.String)">
+            <summary>Split a string by \r\n or \n</summary>
+            <param name="s">Multiline string to split</param>
+            <returns>Array of strings</returns>
+        </member>
+        <member name="T:HoMMol_core.Graphics.Matr">
+            <summary>Materials list, used in Mesh files</summary>
+        </member>
+        <member name="F:HoMMol_core.Graphics.Matr.Id">
+            <summary>Identifier name, can be in chinese</summary>
+        </member>
+        <member name="F:HoMMol_core.Graphics.Matr.Diffuse">
+            <summary>Diffuse color RGBA</summary>
+        </member>
+        <member name="F:HoMMol_core.Graphics.Matr.Ambient">
+            <summary>Ambient color RGB</summary>
+        </member>
+        <member name="F:HoMMol_core.Graphics.Matr.Specular">
+            <summary>Specular 'shininess'</summary>
+        </member>
+        <member name="F:HoMMol_core.Graphics.Matr.Emissive">
+            <summary>Emissive color RGB</summary>
+        </member>
+        <member name="F:HoMMol_core.Graphics.Matr.Power">
+            <summary>Sharpness if specular highlight</summary>
+        </member>
+        <member name="F:HoMMol_core.Graphics.Matr.Comments">
+            <summary>Comment lines in ini file</summary>
+        </member>
+        <member name="M:HoMMol_core.Graphics.Matr.#ctor">
+            <summary>New default Material</summary>
+        </member>
+        <member name="M:HoMMol_core.Graphics.Matr.#ctor(System.String,HoMMol_core.Graphics.D3DColor,HoMMol_core.Graphics.D3DColor,HoMMol_core.Graphics.D3DColor,HoMMol_core.Graphics.D3DColor,System.Single,System.String)">
+            <summary>New Material from provided fields</summary>
+            <param name="id">Identifier name</param>
+            <param name="d">Diffuse color</param>
+            <param name="a">Ambient color</param>
+            <param name="s">Specular color</param>
+            <param name="e">Emissive color</param>
+            <param name="p">Power</param>
+            <param name="c">Comments in ini file</param>
+        </member>
+        <member name="M:HoMMol_core.Graphics.Matr.#ctor(System.String)">
+            <summary>New Material from a string, like in Matr ini file
+            <remarks>Throws ArgumentException if the string has bad format</remarks></summary>
+            <param name="str">String like in ini file line</param>
+        </member>
+        <member name="M:HoMMol_core.Graphics.Matr.#ctor(System.Byte[])">
+            <summary>New Material from a byte array, like in Matr dbc file
+            <remarks>Throws ArgumentException if the byte array has bad format</remarks></summary>
+            <param name="b">Data read from dbc binary file</param>
+        </member>
+        <member name="M:HoMMol_core.Graphics.Matr.AddComments(System.String)">
+            <summary>Add comments for this material</summary>
+            <param name="s">String like in ini comment lines</param>
+        </member>
+        <member name="M:HoMMol_core.Graphics.Matr.ToString">
+            <summary>Get the material in string format</summary>
+            <returns>a string, as stored in Matr ini file</returns>
+        </member>
+        <member name="M:HoMMol_core.Graphics.Matr.ToBytes">
+            <summary>Get the material in a byte array</summary>
+            <returns>a 52 bytes array, as stored in Matr dbc file</returns>
+        </member>
+        <member name="T:HoMMol_core.IO.MatrFile">
+            <summary>Materials list collection
+            <remarks>Only handles data and a FileStream, 
+            use dbcFile to handle the file</remarks></summary>
+        </member>
+        <member name="F:HoMMol_core.IO.MatrFile.MAGIC_TYPE_TXT">
+            <summary>Magyc Type Header in dbc binary files, in String format</summary>
+        </member>
+        <member name="F:HoMMol_core.IO.MatrFile.MAGIC_TYPE_BIN">
+            <summary>Magyc Type Header in dbc binary files, in UInt32 format</summary>
+        </member>
+        <member name="F:HoMMol_core.IO.MatrFile.Data">
+            <summary>Stores all entries</summary>
+        </member>
+        <member name="F:HoMMol_core.IO.MatrFile.Amount">
+            <summary>Amount of data entries</summary>
+        </member>
+        <member name="F:HoMMol_core.IO.MatrFile.InitialComments">
+            <summary>Stores initial comments, if any</summary>
+        </member>
+        <member name="M:HoMMol_core.IO.MatrFile.#ctor">
+            <summary>Default Constructor: New Matr empty instance
+            <remarks>Does not handle the file, just the data</remarks></summary>
+        </member>
+        <member name="M:HoMMol_core.IO.MatrFile.Load(System.UInt32,System.IO.FileStream,HoMMol_core.IO.dbcFile.Mode)">
+            <summary>Load a Matr file from a filestream
+            <remarks>Use first the constructor</remarks>
+            </summary>
+            <param name="amount">Amount of data entries</param>
+            <param name="fs">FileStream to read from</param>
+            <param name="mode">BIN or TXT, for binary dbc or text ini</param>
+            <returns>False if error loading the data</returns>
+            <exception cref="T:System.Exception">If cannot find the header</exception>
+        </member>
+        <member name="M:HoMMol_core.IO.MatrFile.Save(System.IO.FileStream,HoMMol_core.IO.dbcFile.Mode)">
+            <summary>Save a Matr file to a filestream</summary>
+            <param name="fs">FileStream to write to</param>
+            <param name="mode">BIN or TXT, for binary dbc or text ini</param>
+            <returns>False if error saving the data</returns>
+        </member>
+        <member name="T:HoMMol_core.Graphics.D3DBLEND">
+            <summary>Alpha Blending Mode with Direct 3D
+            It sets the way how to calculate mixed color from image and background
+            final color = (image color * Asb) + (background color * Adb)
+            Note that it could be different operators, but usually it is '+'
+            <remarks>Used with Mesh and Texture for 
+            Asb and Adb (Alpha Source/Destination Blend)</remarks>
+            </summary>
+        </member>
+        <member name="F:HoMMol_core.Graphics.D3DBLEND.D3DBLEND_ZERO">
+            <summary>Disable this color (multiply * 0)</summary>
+        </member>
+        <member name="F:HoMMol_core.Graphics.D3DBLEND.D3DBLEND_ONE">
+            <summary>Enable this color (multiply * 1)</summary>
+        </member>
+        <member name="F:HoMMol_core.Graphics.D3DBLEND.D3DBLEND_SRCCOLOR">
+            <summary>Image color (image RGBA)</summary>
+        </member>
+        <member name="F:HoMMol_core.Graphics.D3DBLEND.D3DBLEND_INVSRCCOLOR">
+            <summary>Inverse image color (image RGBA * -1)</summary>
+        </member>
+        <member name="F:HoMMol_core.Graphics.D3DBLEND.D3DBLEND_SRCALPHA">
+            <summary>Image alpha channel (image A)</summary>
+        </member>
+        <member name="F:HoMMol_core.Graphics.D3DBLEND.D3DBLEND_INVSRCALPHA">
+            <summary>Inverse image alpha channel (image A * -1)</summary>
+        </member>
+        <member name="F:HoMMol_core.Graphics.D3DBLEND.D3DBLEND_DESTALPHA">
+            <summary>Background alpha channel (background A)</summary>
+        </member>
+        <member name="F:HoMMol_core.Graphics.D3DBLEND.D3DBLEND_INVDESTALPHA">
+            <summary>Inverse background alpha channel (background A * -1)</summary>
+        </member>
+        <member name="F:HoMMol_core.Graphics.D3DBLEND.D3DBLEND_DESTCOLOR">
+            <summary>Background color (background RGBA)</summary>
+        </member>
+        <member name="F:HoMMol_core.Graphics.D3DBLEND.D3DBLEND_INVDESTCOLOR">
+            <summary>Inverse background color (background RGBA * -1)</summary>
+        </member>
+        <member name="T:HoMMol_core.Graphics.D3DColor">
             <summary>A 4 components color value (ARGB)</summary>
         </member>
-        <member name="F:HoMMol_core.D3DColor.Alpha">
+        <member name="F:HoMMol_core.Graphics.D3DColor.Alpha">
             <summary>Alpha channel value, for transparency.</summary>
         </member>
-        <member name="F:HoMMol_core.D3DColor.Red">
+        <member name="F:HoMMol_core.Graphics.D3DColor.Red">
             <summary>Red channel value.</summary>
         </member>
-        <member name="F:HoMMol_core.D3DColor.Green">
+        <member name="F:HoMMol_core.Graphics.D3DColor.Green">
             <summary>Green Channel value.</summary>
         </member>
-        <member name="F:HoMMol_core.D3DColor.Blue">
+        <member name="F:HoMMol_core.Graphics.D3DColor.Blue">
             <summary>Blue Channel value.</summary>
         </member>
-        <member name="M:HoMMol_core.D3DColor.#ctor">
+        <member name="M:HoMMol_core.Graphics.D3DColor.#ctor">
             <summary>New default instance</summary>
         </member>
-        <member name="M:HoMMol_core.D3DColor.#ctor(System.Byte,System.Byte,System.Byte,System.Byte)">
+        <member name="M:HoMMol_core.Graphics.D3DColor.#ctor(System.Byte,System.Byte,System.Byte,System.Byte)">
             <summary>New instance from provided fields</summary>
         </member>
-        <member name="M:HoMMol_core.D3DColor.#ctor(System.UInt32)">
+        <member name="M:HoMMol_core.Graphics.D3DColor.#ctor(System.UInt32)">
             <summary>New instance from a 32 bits value, as stored in Matr dbc file</summary>
         </member>
-        <member name="M:HoMMol_core.D3DColor.ToBytes">
+        <member name="M:HoMMol_core.Graphics.D3DColor.ToBytes">
             <summary>Get the color in a Byte array format</summary>
             <returns>a 4 bytes buffer array, as stored in Matr dbc file</returns>
         </member>
-        <member name="M:HoMMol_core.D3DColor.ToUInt32">
+        <member name="M:HoMMol_core.Graphics.D3DColor.ToUInt32">
             <summary>Get the color in UInt32 format</summary>
             <returns>a 32 bits value, as stored in Matr dbc file</returns>
         </member>
-        <member name="M:HoMMol_core.D3DColor.ToString">
+        <member name="M:HoMMol_core.Graphics.D3DColor.ToString">
             <summary>Get the color in string format</summary>
             <returns>a 8 chars lenght string, as stored in Matr ini file</returns>
         </member>
