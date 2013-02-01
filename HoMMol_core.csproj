@@ -45,8 +45,11 @@
     <Compile Include="source\Common\Common.cs" />
     <Compile Include="source\Crypto\HashNames.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="source\IO\Matr.cs" />
-    <Compile Include="source\IO\Mesh.cs" />
+    <Compile Include="source\Graphics\GraphicsCommon.cs" />
+    <Compile Include="source\Graphics\Matr.cs" />
+    <Compile Include="source\IO\MatrFile.cs" />
+    <Compile Include="source\Graphics\Mesh.cs" />
+    <Compile Include="source\IO\dbcFile.cs" />
   </ItemGroup>
   <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
