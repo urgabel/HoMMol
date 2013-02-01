@@ -11,16 +11,22 @@ namespace HoMMol_core.Graphics
         #region Properties
         /// <summary>Identifier name, can be in chinese</summary>
         public String Id;
+
         /// <summary>Diffuse color RGBA</summary>
         public D3DColor Diffuse;
+
         /// <summary>Ambient color RGB</summary>
         public D3DColor Ambient;
+
         /// <summary>Specular 'shininess'</summary>
         public D3DColor Specular;
+
         /// <summary>Emissive color RGB</summary>
         public D3DColor Emissive;
+
         /// <summary>Sharpness if specular highlight</summary>
-        float Power;
+        public float Power;
+
         /// <summary>Comment lines in ini file</summary>
         String Comments;
         #endregion
@@ -37,6 +43,7 @@ namespace HoMMol_core.Graphics
             Power = 0;
             Comments = String.Empty;
         }
+
         /// <summary>New Material from provided fields</summary>
         /// <param name="id">Identifier name</param>
         /// <param name="d">Diffuse color</param>
@@ -56,6 +63,7 @@ namespace HoMMol_core.Graphics
             Power = p;
             Comments = c;
         }
+
         /// <summary>New Material from a string, like in Matr ini file
         /// <remarks>Throws ArgumentException if the string has bad format</remarks></summary>
         /// <param name="str">String like in ini file line</param>
@@ -76,8 +84,10 @@ namespace HoMMol_core.Graphics
             Emissive = new D3DColor(e);
             Comments = String.Empty;
         }
+
         /// <summary>New Material from a byte array, like in Matr dbc file
         /// <remarks>Throws ArgumentException if the byte array has bad format</remarks></summary>
+        /// <param name="b">Data read from dbc binary file</param>
         public Matr(Byte[] b)
         {
             if (b.Length != 52) throw new ArgumentException("Incorrect Material format; b must have 52 bytes");
@@ -104,6 +114,7 @@ namespace HoMMol_core.Graphics
             else
                 Comments += "\r\n" + s;
         }
+
         /// <summary>Get the material in string format</summary>
         /// <returns>a string, as stored in Matr ini file</returns>
         public override string ToString()
@@ -112,7 +123,7 @@ namespace HoMMol_core.Graphics
             String[] c;
             if (!String.IsNullOrEmpty(Comments))
             {
-                c = Comments.Split(new string[] { "\r\n", "\n" }, StringSplitOptions.None);
+                c = Common.SplitLines(Comments);
                 s = String.Join("\r\n//", c);
             }
             s += Id + " " + Diffuse.ToString() + " " + Ambient.ToString()
@@ -120,6 +131,7 @@ namespace HoMMol_core.Graphics
                 + " " + Power.ToString();
             return s;
         }
+
         /// <summary>Get the material in a byte array</summary>
         /// <returns>a 52 bytes array, as stored in Matr dbc file</returns>
         public Byte[] ToBytes()
