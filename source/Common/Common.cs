@@ -31,79 +31,16 @@ namespace HoMMol_core
             Buffer.BlockCopy(eb, 0, b, 0, eb.Length);
             return b;
         }
-    }
-    /// <summary>A 4 components color value (ARGB)</summary>
-    public class D3DColor
-    {
-        #region Properties
-        /// <summary>Alpha channel value, for transparency.</summary>
-        public Byte Alpha;
-        /// <summary>Red channel value.</summary>
-        public Byte Red;
-        /// <summary>Green Channel value.</summary>
-        public Byte Green;
-        /// <summary>Blue Channel value.</summary>
-        public Byte Blue;
-        #endregion
 
-        #region Constructor
-        /// <summary>New default instance</summary>
-        public D3DColor()
-        {
-            Alpha = 0xFF;
-            Red = 0xFF;
-            Green = 0xFF;
-            Blue = 0xFF;
-        }
-        /// <summary>New instance from provided fields</summary>
-        public D3DColor(Byte a, Byte r, Byte g, Byte b)
-        {
-            Alpha = a;
-            Red = r;
-            Green = g;
-            Blue = b;
-        }
-        /// <summary>New instance from a 32 bits value, as stored in Matr dbc file</summary>
-        public D3DColor(UInt32 c)
-        {
-            Alpha = (Byte)(c >> 24);
-            Red = (Byte)((c & 0x00FF0000) >> 16);
-            Green = (Byte)((c & 0x0000FF00) >> 8);
-            Blue = (Byte)(c & 0x0000FF00);
-        }
-        /* 
-         * Not added constructor from string to avoid exceptions from 
-         * constructors in common classes. When reading an ini file, 
-         * parse the string where using this class.
-        */
-        #endregion
+        /// <summary>Text line separators</summary>
+        public static String[] lineSplit = { "\r\n", "\n" };
 
-        #region PublicMethods
-        /// <summary>Get the color in a Byte array format</summary>
-        /// <returns>a 4 bytes buffer array, as stored in Matr dbc file</returns>
-        public Byte[] ToBytes()
+        /// <summary>Split a string by \r\n or \n</summary>
+        /// <param name="s">Multiline string to split</param>
+        /// <returns>Array of strings</returns>
+        public static String[] SplitLines(String s)
         {
-            Byte[] b = new Byte[4];
-            b[0] = Alpha;
-            b[1] = Red;
-            b[2] = Green;
-            b[3] = Blue;
-            return b;
+            return s.Split(lineSplit, StringSplitOptions.None);
         }
-        /// <summary>Get the color in UInt32 format</summary>
-        /// <returns>a 32 bits value, as stored in Matr dbc file</returns>
-        public UInt32 ToUInt32()
-        {
-            //return (UInt32)(Alpha * 0x1000000 + Red * 0x10000 + Green * 0x100 + Blue);
-            return BitConverter.ToUInt32(this.ToBytes(), 0);
-        }
-        /// <summary>Get the color in string format</summary>
-        /// <returns>a 8 chars lenght string, as stored in Matr ini file</returns>
-        public override string ToString()
-        {
-            //return this.ToUInt32().ToString("X8");
-            return BitConverter.ToString(this.ToBytes()).Replace("-", string.Empty);
-        }
-        #endregion
     }
 }
