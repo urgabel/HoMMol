@@ -5,7 +5,7 @@ using System.Text;
 
 namespace HoMMol_core
 {
-    /// <summary>Shared variables and methods in the whole project</summary>
+    /// <summary>Shared constants and methods in the whole project</summary>
     public static class Common
     {
         /// <summary>enc can be used from everywhere
@@ -41,6 +41,28 @@ namespace HoMMol_core
         public static String[] SplitLines(String s)
         {
             return s.Split(lineSplit, StringSplitOptions.None);
+        }
+
+        /// <summary>Join all strings in a list until last 
+        /// not empty string</summary>
+        /// <param name="sl">List of strings to search in</param>
+        /// <returns>joined string, separated with "\r\n"</returns>
+        // Surely this method could be improved, but at least it does the task
+        public static String ConcatenateAllUntilLastNotEmpty(List<String> sl)
+        {
+            String rl = null;
+            int max = 0;
+            for (int i = 0; i < sl.Count; i++)
+                if (!String.IsNullOrWhiteSpace(sl[i]))
+                    max = i;
+            for (int i = 0; i <= max; i++)
+            {
+                if (String.IsNullOrEmpty(rl))
+                    rl += sl[i];
+                else
+                    rl += "\r\n" + sl[i];
+            }
+            return rl;
         }
     }
 }
