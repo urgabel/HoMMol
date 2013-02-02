@@ -3,6 +3,7 @@ using System.IO;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using HoMMol_core.Ini;
 
 namespace HoMMol_core.IO
 {
@@ -60,7 +61,8 @@ namespace HoMMol_core.IO
         private FileStream _dfs = null;     // Destination Filestream
         private StreamReader _sr = null;    // For text read operations
         private StreamWriter _sw = null;    // For text write operations
-        private MatrFile _Matr = null;      // Stores all data
+        private MatrFile _Matr = null;      // Stores all Matr data
+        private MeshFile _Mesh = null;      // Stores all Mesh data
         #endregion
 
         #region Constructor
@@ -165,7 +167,7 @@ namespace HoMMol_core.IO
         /// <param name="m">Mode can be Mode.BIN or MODE.TXT</param>
         /// <returns>False if error loading the file</returns>
         // TODO: Update on supported types
-        //       Now: MATR
+        //       Now: MATR, MESH
         public Boolean Load(Mode m)
         {
             String result = "";
@@ -181,6 +183,12 @@ namespace HoMMol_core.IO
                     case "MATR":
                         {
                             if (! _Matr.Load(Amount, _fs, m))
+                                throw new Exception("Error loading data from  " + _FileName);
+                            break;
+                        }
+                    case "MESH":
+                        {
+                            if (!_Mesh.Load(Amount, _fs, m))
                                 throw new Exception("Error loading data from  " + _FileName);
                             break;
                         }
@@ -206,7 +214,7 @@ namespace HoMMol_core.IO
         /// <param name="m">Mode can be Mode.BIN or MODE.TXT</param>
         /// <returns>False if error saving the file</returns>
         // TODO: Update on supported types
-        //       Now: MATR
+        //       Now: MATR, MESH
         public Boolean Save(String fileName, Mode m)
         {
             String result = "";     // For debug
@@ -219,6 +227,12 @@ namespace HoMMol_core.IO
                     case "MATR":
                         {
                             if (! _Matr.Save(_dfs, m))
+                                throw new Exception("Error saving data to  " + _FileName);
+                            break;
+                        }
+                    case "MESH":
+                        {
+                            if (!_Mesh.Save(_dfs, m))
                                 throw new Exception("Error saving data to  " + _FileName);
                             break;
                         }
@@ -255,7 +269,7 @@ namespace HoMMol_core.IO
         // Detect type of binary dbc file
         // Read first bytes and compare to expected data
         // TODO: Update on supported types
-        //       Now: MATR
+        //       Now: MATR, MESH
         private String CheckDbcBinType()
         {
             // Read the Magic Type Header and get the Amount of data
@@ -280,8 +294,10 @@ namespace HoMMol_core.IO
                 else _DbcType += "32";
             }
 
-            // TODO: Remove next line when all types implemented
-            if (_DbcType != "MATR") _DbcType = "Unsupported";
+            // TODO: Remove next sentence when all types implemented
+            if (_DbcType != "MATR"
+                & _DbcType != "MESH"
+                ) _DbcType = "Unsupported";
             
             return _DbcType;
         }
@@ -295,207 +311,88 @@ namespace HoMMol_core.IO
         // TODO: Handle Bad Formats
         // TODO: Handle SimX, surely like Mesh
         // TODO: Update on supported types
-        //       Now: MATR
+        //       Now: MATR, MESH
         private String CheckDbcTxtType()
         {
-            // Text dbc files includes amount only for Matr type
+            // Text dbc files includes amount in first line only for Matr type
+            //   and in second line for types Ropt, Effe, Simo, Mesh/Simx;
+            //   does not include amount for Rsdb or Emoi
             // Skip initial comments and empty lines
             // Read line
-            // Check first char
-
-            // If "/" -> Comment (Check if "//" or "/*")
-            // If ";" -> Comment
-            // If "[" -> Effe, Ropt, Simo, Simx, Mesh
-            // If "M" -> Matr (Check if Material=)
-            // If number -> Emoi, Rsdb
-            // Otherwise Unsupported
+            // Check if supported type
 
             _fs.Seek(0, SeekOrigin.Begin);
             _sr = new StreamReader(_fs, Common.enc);
             Int32 lineCount = 0;
             long testNumber = 0;
             String line;
-            String firstChar;
             Boolean continueReading = true;
-            Boolean longComment = false;
+            PARSE_COMMENTS_STATE commentsState = PARSE_COMMENTS_STATE.NotCommentLine;
 
             // Read Header
             while (continueReading && (line = _sr.ReadLine()) != null)
             {
                 lineCount++;
-                if (!String.IsNullOrEmpty(line.Trim()))     // Skip empty lines
+                if (IniCommon.ParseLineComments(line, commentsState) >= 0)
                 {
-                    if (longComment)
+                    // Comment, add comment?
+                    // Nothing to do, skip comment and continue reading lines
+                }
+                else
+                {
+                    // Not comment, parse content
+                    continueReading = false;
+                    if (line.StartsWith("Material="))   // Matr
                     {
-                        // Check here if finish long comment "*/"
-                        // If there are data in same line after "*/" it
-                        //   should be an unsupported format
-                        if (line.Length > 1 && line.Substring(line.Length - 2) == "*/")
+                        if (UInt32.TryParse(line.Split('=')[1], out Amount))
+                            _DbcType = "MATR";
+                        else
+                            _DbcType = "BadFormatMatr";
+                    }
+                    else if (line.StartsWith("[") && line.EndsWith("]"))
+                    {
+                        // Effe, Ropt, Simo, Simx, Mesh
+                        String line2;
+                        if ((line2 = _sr.ReadLine()) == null)
+                            _DbcType = "BadFormatBracketEOF";   // End of file
+                        else
                         {
-                            longComment = false;
+                            if (line2.StartsWith("Part=")       // Mesh or Simx
+                                && UInt32.TryParse(line2.Split('=')[1], out Amount))
+                                _DbcType = "MESH";
+                            else if (line2.StartsWith("Count=") // Ropt
+                                && UInt32.TryParse(line2.Split('=')[1], out Amount))
+                                _DbcType = "ROPT";
+                            else if (line2.StartsWith("Amount=") // Effe
+                                && UInt32.TryParse(line2.Split('=')[1], out Amount))
+                                _DbcType = "EFFE";
+                            else if (line2.StartsWith("PartAmount=") // Simo
+                                && UInt32.TryParse(line2.Split('=')[1], out Amount))
+                                _DbcType = "SIMO";
+                            else 
+                                _DbcType = "Unsupported";
                         }
+                    }
+                    else if (line.Contains("="))    // Check if Rsdb
+                    {
+                        // Some Rsdb ini files, like ActionSound.ini or Action3DEffect.ini uses nnn.nnnn.nnn
+                        if (long.TryParse(line.Split('=')[0].Replace(".", String.Empty), out testNumber))
+                            _DbcType = "RSDB";
+                        else
+                            _DbcType = "BadFormatRsdb";
+                    }
+                    else if (line.Contains(" "))    // Check if Emoi
+                    {
+                        String[] s = line.Split(' ');
+                        if (s.Length == 2 && long.TryParse(s[0], out testNumber))
+                            _DbcType = "EMOI";
+                        else
+                            _DbcType = "BadFormatEmoi";
                     }
                     else
                     {
-                        firstChar = line.Substring(0, 1);
-                        switch (firstChar)
-                        {
-                            case "[":
-                                {       // Effe, Ropt, Simo, Simx, Mesh
-                                    if (line.Length < 3 
-                                        || line.Substring(line.Length - 1) != "]" 
-                                        || !long.TryParse(line.Substring(1, line.Length - 2), out testNumber))
-                                    {
-                                        _DbcType = "BadFormatBracket";
-                                    }
-                                    else
-                                    {
-                                        String line2;
-                                        if ((line2 = _sr.ReadLine()) != null)
-                                        {
-                                            if (line2.Length > 5 && line2.Substring(0, 5) == "Part=")
-                                            {
-                                                // Check if Mesh or Simx
-                                                _DbcType = "MESH";
-                                            }
-                                            else if (line2.Length > 6 && line2.Substring(0, 6) == "Count=")
-                                            {
-                                                _DbcType = "ROPT";
-                                            }
-                                            else if (line2.Length > 7 && line2.Substring(0, 7) == "Amount=")
-                                            {
-                                                _DbcType = "EFFE";
-                                            }
-                                            else if (line2.Length > 11 && line2.Substring(0, 11) == "PartAmount=")
-                                            {
-                                                _DbcType = "SIMO";
-                                            }
-                                            else
-                                            {
-                                                _DbcType = "Unsupported";
-                                            }
-                                        }
-                                        else
-                                        {
-                                            // End of file
-                                            _DbcType = "BadFormatBracketEOF";
-                                        }
-                                        _DbcType = "";
-                                    }
-                                    continueReading = false;
-                                    break;
-                                }
-                            case "M":
-                                {       // Matr (Check if "Material=")
-                                    if (line.Length > 9 && line.Substring(0, 9) == "Material=")
-                                    {
-                                        // Check amount;
-                                        if (UInt32.TryParse(line.Split('=')[1], out Amount))
-                                        {
-                                            _DbcType = "MATR";
-                                        }
-                                        else
-                                        {
-                                            _DbcType = "BadFormatMatr";
-                                        }
-                                    }
-                                    else
-                                    {
-                                        _DbcType = "Unsupported";
-                                    }
-                                    continueReading = false;
-                                    break;
-                                }
-                            case "0":
-                            case "1":
-                            case "2":
-                            case "3":
-                            case "4":
-                            case "5":
-                            case "6":
-                            case "7":
-                            case "8":
-                            case "9":
-                                {       // Emoi, Rsdb
-                                    if (line.Contains('='))
-                                    {
-                                        // Check if Rsdb
-                                        // Some Rsdb ini files, like ActionSound.ini uses nnn.nnnn.nnn
-                                        if (long.TryParse(line.Split('=')[0].Replace(".", String.Empty), out testNumber))
-                                        {
-                                            _DbcType = "RSDB";
-                                        }
-                                        else
-                                        {
-                                            _DbcType = "BadFormatRsdb";
-                                        }
-                                    }
-                                    else
-                                    {
-                                        // Check if Emoi
-                                        if (line.Contains(' '))
-                                        {
-                                            String[] s = line.Split(' ');
-                                            if (s.Length == 2 && long.TryParse(s[0], out testNumber))
-                                            {
-                                                _DbcType = "EMOI";
-                                            }
-                                            else
-                                            {
-                                                _DbcType = "BadFormatEmoi";
-                                            }
-                                        }
-                                        else
-                                        {
-                                            _DbcType = "BadFormatNumber";
-                                        }
-                                    }
-                                    continueReading = false;
-                                    break;
-                                }
-                            case ";":
-                                {       // Comment
-                                    // Nothing to do, skip comment and continue reading lines
-                                    break;
-                                }
-                            case "/":
-                                {       // Comment. Check if "//" or "/*"
-                                    if (line.Length == 1)
-                                    {
-                                        _DbcType = "Unsupported";
-                                        continueReading = false;
-                                    }
-                                    else
-                                    {
-                                        firstChar = line.Substring(0, 2);
-                                        if (firstChar == "//")
-                                        {
-                                            // Nothing to do, skip comment and continue reading lines
-                                        }
-                                        else if (firstChar == "/*")
-                                        {
-                                            // If there are data in same line after "*/" it
-                                            //   should be an unsupported format
-                                            // Check if line ends with "*/"
-                                            if (line.Substring(line.Length - 2) == "*/")
-                                            {
-                                                // Nothing to do, skip comment and continue reading lines
-                                            }
-                                            else
-                                            {
-                                                longComment = true;
-                                            }
-                                        }
-                                    }
-                                    break;
-                                }
-                            default:
-                                {       // Unsupported
-                                    _DbcType = "Unsupported";
-                                    continueReading = false;
-                                    break;
-                                }
-                        }
+                        _DbcType = "Unsupported";
+                        continueReading = false;
                     }
                 }
             }
@@ -504,7 +401,7 @@ namespace HoMMol_core.IO
             if (_DbcType == null) _DbcType = "Undefined";
 
             // Check if Bad Format
-            if (_DbcType.Length > 8 && _DbcType.Substring(0, 9) == "BadFormat")
+            if (_DbcType.Length > 8 && _DbcType.StartsWith("BadFormat"))
             {
                 // TODO: Handle here Bad Formats
                 _DbcType = "Unsupported";
@@ -517,8 +414,10 @@ namespace HoMMol_core.IO
                 else _DbcType += "32";
             }
 
-            // TODO: Remove next line when all types implemented
-            if (_DbcType != "MATR") _DbcType = "Unsupported";
+            // TODO: Remove next sentence when all types implemented
+            if (_DbcType != "MATR"
+                & _DbcType != "MESH"
+                ) _DbcType = "Unsupported";
 
             return _DbcType;
         }
@@ -580,7 +479,7 @@ namespace HoMMol_core.IO
         // Initialize the appropriate Data Store, depending on _DbcType
         // Can throw NotImplementedException "Cannot handle dbc type"
         // TODO: Update on supported types
-        //       Now: MATR
+        //       Now: MATR, MESH
         private void InitDataStore()
         {
             switch (_DbcType)
@@ -588,6 +487,11 @@ namespace HoMMol_core.IO
                 case "MATR":
                     {
                         _Matr = new MatrFile();
+                        break;
+                    }
+                case "MESH":
+                    {
+                        _Mesh= new MeshFile();
                         break;
                     }
                 default:
