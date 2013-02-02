@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using HoMMol_core.Graphics;
+using HoMMol_core.Ini;
 
 namespace HoMMol_core.IO
 {
@@ -32,7 +33,7 @@ namespace HoMMol_core.IO
         #endregion
 
         #region Constructor
-        /// <summary>Default Constructor: New Matr empty instance
+        /// <summary>Default Constructor: New MatrFile empty instance
         /// <remarks>Does not handle the file, just the data</remarks></summary>
         public MatrFile()
         {
@@ -49,16 +50,16 @@ namespace HoMMol_core.IO
         /// <param name="mode">BIN or TXT, for binary dbc or text ini</param>
         /// <returns>False if error loading the data</returns>
         /// <exception cref="Exception">If cannot find the header</exception>
-        // TODO: Add support for long comments "/* [...] */"
         public Boolean Load(UInt32 amount, FileStream fs, dbcFile.Mode mode)
         {
             Boolean result = false;
-            Boolean headerIsSet = false;
             fs.Seek(0, SeekOrigin.Begin);
             switch (mode)
             {
                 case dbcFile.Mode.TXT:
                     {
+                        Boolean headerIsSet = false;
+                        PARSE_COMMENTS_STATE commentsState = PARSE_COMMENTS_STATE.NotCommentLine;
                         Int32 lineCount = 0;
                         // Simplified Chinese encoding
                         using (StreamReader sr = new StreamReader(fs, Common.enc, false)) lock (Data)
@@ -69,54 +70,41 @@ namespace HoMMol_core.IO
                             while ((line = sr.ReadLine()) != null)
                             {
                                 lineCount++;
-                                line = line.Trim();     // Remove spaces from start and end of line
-                                if (line.Length > 0)    //skip empty lines
+                                // Check if comments
+                                if ((commentsState = IniCommon.ParseLineComments(line, commentsState)) >= 0)
                                 {
                                     // Store comments to add after created a new Matr
-                                    if (line.Length > 1 && line.Substring(0,2) == "//"
-                                        | line.Substring(0,1) == ";")
-                                    {
-                                        hasComments = true;
-                                        if (String.IsNullOrEmpty(Comments))
-                                            Comments = line;
-                                        else
-                                            Comments += "\r\n" + line;
-                                    }
+                                    if (hasComments)
+                                        Comments += "\r\n" + line;
                                     else
                                     {
-                                        if (!headerIsSet)
-                                        {
-                                            if (hasComments)
-                                            {
-                                                InitialComments = Comments;
-                                                hasComments = false;
-                                                Comments = String.Empty;
-                                            }
-                                            if (line.Length > 9 
-                                                && line.Substring(0, 9) == "Material="
-                                                && UInt32.TryParse(line.Substring(9), out Amount))
-                                            {
-                                                // OK
-                                            }
-                                            else
-                                            {
-                                                // Bad format
-                                                throw new Exception("Cannot find the header; expected: Material=##");
-                                            }
-                                        }
-                                        else try
-                                        {
-                                            Matr m = new Matr(line);
-                                            if (hasComments) m.AddComments(Comments);
-                                            Data.Add(m.Id, m);
-                                            hasComments = false;
-                                            Comments = String.Empty;
-                                        }
-                                        catch
-                                        {
-                                            // Skip lines with incorrect format
-                                            //Trace.Warning("Skiped line " + lineCount + " with incorrect format.");
-                                        }
+                                        hasComments = true;
+                                        Comments = line;
+                                    }
+                                }
+                                else
+                                {
+                                    line = line.Trim();     // Remove spaces from start and end of line
+                                    if (!headerIsSet)
+                                    {
+                                        if (line.StartsWith("Material=")
+                                            && UInt32.TryParse(line.Substring(9), out Amount))
+                                            headerIsSet = true;
+                                        else
+                                            throw new Exception("Cannot find the header; expected: Material=##");
+                                    }
+                                    else try
+                                    {
+                                        Matr m = new Matr(line);
+                                        if (hasComments) m.AddComments(Comments);
+                                        Data.Add(m.Id, m);
+                                        hasComments = false;
+                                        Comments = String.Empty;
+                                    }
+                                    catch
+                                    {
+                                        // Skip lines with incorrect format
+                                        //Trace.Warning("Skiped line " + lineCount + " with incorrect format.");
                                     }
                                 }
                             }
@@ -160,7 +148,7 @@ namespace HoMMol_core.IO
             {
                 case dbcFile.Mode.TXT:
                     {
-                        Int32 lineCount = 0;    // Only for debug
+                        UInt32 lineCount = 0;    // Only for debug
                         // Simplified Chinese encoding
                         using (StreamWriter sw = new StreamWriter(fs, Common.enc)) lock (Data)
                         {
