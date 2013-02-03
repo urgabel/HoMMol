@@ -34,7 +34,7 @@ namespace HoMMol_core.Graphics
         #endregion
 
         #region Properties
-        /// <summary>Texture</summary>
+        /// <summary>Mesh</summary>
         /// <value>Mesh Id, in 3DObj.ini</value>
         public UInt32 Mesh;     // Mesh Id
 
@@ -168,11 +168,11 @@ namespace HoMMol_core.Graphics
             if (str.Length < 7)
                 throw new ArgumentOutOfRangeException("str", "there are too few lines; expected 7, found " + str.Length.ToString());
             Mesh = UInt32.Parse(str[0].Split('=')[1]);
-            Mesh = UInt32.Parse(str[1].Split('=')[1]);
-            Mesh = UInt32.Parse(str[2].Split('=')[1]);
-            Mesh = UInt32.Parse(str[3].Split('=')[1]);
-            Mesh = UInt32.Parse(str[4].Split('=')[1]);
-            Mesh = UInt32.Parse(str[5].Split('=')[1]);
+            Texture = UInt32.Parse(str[1].Split('=')[1]);
+            MixTex = UInt32.Parse(str[2].Split('=')[1]);
+            MixOpt= Byte.Parse(str[3].Split('=')[1]);
+            Asb = Byte.Parse(str[4].Split('=')[1]);
+            Adb = Byte.Parse(str[5].Split('=')[1]);
             Material = str[6].Split('=')[1];
         }
         #endregion
@@ -186,6 +186,7 @@ namespace HoMMol_core.Graphics
         }
 
         /// <summary>Check if provided instance has the same values</summary>
+        /// <param name="M">Model to compare with</param>
         /// <returns>Return true if same values</returns>
         public Boolean Equals(ModelPart M)
         {
@@ -201,18 +202,19 @@ namespace HoMMol_core.Graphics
 
         /// <summary>Parse to String without index</summary>
         /// <returns>Return a string ready to save to an ini file</returns>
+        // Needed to override in case of optional index not provided
         public override String ToString()
         {
             return ToString(0);
         }
 
         /// <summary>Parse to a String with an index in each field</summary>
+        /// <param name="i">Optional, index, inside an Model structure</param>
         /// <returns>Return a string ready to save to an ini file</returns>
-        public String ToString(UInt32 i)
+        public String ToString(UInt32 i = 0)
         {
             String s = "";
-            String index = "0";     // By default
-            if (i != 0xFFFFFFFF) index = i.ToString();
+            String index = i.ToString();     // By default is 0
             s += "Mesh" + index + "=" + Mesh + "\r\n";
             s += "Texture" + index + "=" + Texture + "\r\n";
             s += "MixTex" + index + "=" + MixTex + "\r\n";
@@ -229,7 +231,7 @@ namespace HoMMol_core.Graphics
         /// to use the number, or a zero otherwise. 
         /// <see cref="ToBytes(Byte)"/></remarks>
         /// </summary>
-        /// <returns>Return an array of bytes ready to save to a dbc file</returns>
+        /// <returns>Return an array of 16 bytes ready to save to a dbc file</returns>
         public Byte[] ToBytes()
         {
             Byte b;
@@ -242,7 +244,7 @@ namespace HoMMol_core.Graphics
 
         /// <summary>Parse to array of bytes</summary>
         /// <param name="material">Material Id order number, in Material.ini</param>
-        /// <returns>Return an array of bytes ready to save to a dbc file</returns>
+        /// <returns>Return an array of 16 bytes ready to save to a dbc file</returns>
         public Byte[] ToBytes(Byte material)
         {
             Byte[] b = new Byte[16];
