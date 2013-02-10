@@ -49,6 +49,8 @@ namespace HoMMol_core.IO
         #endregion
 
         #region Properties
+        // TODO: Update on supported types
+        //       Now: MATR, MESH, EFFE
         /// <summary>Amount of data entries</summary>
         public UInt32 Amount = 0;
 
@@ -63,6 +65,7 @@ namespace HoMMol_core.IO
         private StreamWriter _sw = null;    // For text write operations
         private MatrFile _Matr = null;      // Stores all Matr data
         private MeshFile _Mesh = null;      // Stores all Mesh data
+        private EffeFile _Effe = null;      // Stores all Effe data
         #endregion
 
         #region Constructor
@@ -166,8 +169,9 @@ namespace HoMMol_core.IO
         /// </summary>
         /// <param name="m">Mode can be Mode.BIN or MODE.TXT</param>
         /// <returns>False if error loading the file</returns>
+        // TODO: Add step to read Material.Ini when needed (to do: check when is needed)
         // TODO: Update on supported types
-        //       Now: MATR, MESH
+        //       Now: MATR, MESH, EFFE
         public Boolean Load(Mode m)
         {
             String result = "";
@@ -192,6 +196,12 @@ namespace HoMMol_core.IO
                                 throw new Exception("Error loading data from  " + _FileName);
                             break;
                         }
+                    case "EFFE":
+                        {
+                            if (!_Effe.Load(Amount, _fs, m))
+                                throw new Exception("Error loading data from  " + _FileName);
+                            break;
+                        }
                     default:
                         {
                             throw new NotImplementedException("Cannot handle " + _DbcType);
@@ -213,8 +223,9 @@ namespace HoMMol_core.IO
         /// <param name="fileName">Full path to the file</param>
         /// <param name="m">Mode can be Mode.BIN or MODE.TXT</param>
         /// <returns>False if error saving the file</returns>
+        // TODO: Add step to read Material.Ini when needed (to do: check when is needed)
         // TODO: Update on supported types
-        //       Now: MATR, MESH
+        //       Now: MATR, MESH, EFFE
         public Boolean Save(String fileName, Mode m)
         {
             String result = "";     // For debug
@@ -233,6 +244,12 @@ namespace HoMMol_core.IO
                     case "MESH":
                         {
                             if (!_Mesh.Save(_dfs, m))
+                                throw new Exception("Error saving data to  " + _FileName);
+                            break;
+                        }
+                    case "EFFE":
+                        {
+                            if (!_Effe.Save(_dfs, m))
                                 throw new Exception("Error saving data to  " + _FileName);
                             break;
                         }
@@ -269,7 +286,7 @@ namespace HoMMol_core.IO
         // Detect type of binary dbc file
         // Read first bytes and compare to expected data
         // TODO: Update on supported types
-        //       Now: MATR, MESH
+        //       Now: MATR, MESH, EFFE
         private String CheckDbcBinType()
         {
             // Read the Magic Type Header and get the Amount of data
@@ -297,6 +314,7 @@ namespace HoMMol_core.IO
             // TODO: Remove next sentence when all types implemented
             if (_DbcType != "MATR"
                 & _DbcType != "MESH"
+                & _DbcType != "EFFE"
                 ) _DbcType = "Unsupported";
             
             return _DbcType;
@@ -311,7 +329,7 @@ namespace HoMMol_core.IO
         // TODO: Handle Bad Formats
         // TODO: Handle SimX, surely like Mesh
         // TODO: Update on supported types
-        //       Now: MATR, MESH
+        //       Now: MATR, MESH, EFFE
         private String CheckDbcTxtType()
         {
             // Text dbc files includes amount in first line only for Matr type
@@ -417,6 +435,7 @@ namespace HoMMol_core.IO
             // TODO: Remove next sentence when all types implemented
             if (_DbcType != "MATR"
                 & _DbcType != "MESH"
+                & _DbcType != "EFFE"
                 ) _DbcType = "Unsupported";
 
             return _DbcType;
@@ -479,7 +498,7 @@ namespace HoMMol_core.IO
         // Initialize the appropriate Data Store, depending on _DbcType
         // Can throw NotImplementedException "Cannot handle dbc type"
         // TODO: Update on supported types
-        //       Now: MATR, MESH
+        //       Now: MATR, MESH, EFFE
         private void InitDataStore()
         {
             switch (_DbcType)
@@ -492,6 +511,11 @@ namespace HoMMol_core.IO
                 case "MESH":
                     {
                         _Mesh= new MeshFile();
+                        break;
+                    }
+                case "EFFE":
+                    {
+                        _Effe = new EffeFile();
                         break;
                     }
                 default:
