@@ -12,7 +12,7 @@ namespace HoMMol_core.Graphics
     /// <remarks>Used with Mesh and Texture for 
     /// Asb and Adb (Alpha Source/Destination Blend)</remarks>
     /// </summary>
-    public enum D3DBLEND
+    public enum D3DBLEND : byte
     {
         /// <summary>Disable this color (multiply * 0)</summary>
         D3DBLEND_ZERO = 1,
@@ -48,7 +48,7 @@ namespace HoMMol_core.Graphics
     /// <summary>Mix options when using more than one texture
     /// <remarks>D3DTOP_* comes from Direct3D</remarks></summary>
     // http://msdn.microsoft.com/en-us/library/windows/desktop/bb172616%28v=vs.85%29.aspx
-    public enum MIX_OPT
+    public enum MIX_OPT : byte
     {
         /// <summary>D3DTOP_SELECTARG1
         /// Texture stage 1st color unmodified; depending on D3DTSS_COLOROP 
@@ -155,18 +155,27 @@ namespace HoMMol_core.Graphics
         TEXMIX_ENV_SHADOWMAP = 31,
     }
 
+    /// <summary>Image color display mode</summary>
+    public enum COLOR_ENABLE : byte
+    {
+        /// <summary>Normal, just light</summary>
+        _SHOWWAY_NORMAL	= 0,
+        /// <summary>Additive, add color</summary>
+        _SHOWWAY_ADDITIVE = 1
+    }
+    
     /// <summary>A 4 components color value (ARGB)</summary>
     public class D3DColor
     {
         #region Properties
         /// <summary>Alpha channel value, for transparency.</summary>
-        public Byte Alpha;
+        public byte Alpha;
         /// <summary>Red channel value.</summary>
-        public Byte Red;
+        public byte Red;
         /// <summary>Green Channel value.</summary>
-        public Byte Green;
+        public byte Green;
         /// <summary>Blue Channel value.</summary>
-        public Byte Blue;
+        public byte Blue;
         #endregion
 
         #region Constructor
