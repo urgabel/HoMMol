@@ -12,8 +12,9 @@ namespace HoMMol_core.IO
     /// <para>Files using this class (either in dbc or ini format):</para>
     /// <para> armet.dbc  armor.dbc  Earrings.dbc  hair.dbc   head.dbc</para>
     /// <para> misc.dbc   mount.dbc  necklace.dbc  skirt.dbc  weapon.dbc</para>
-    /// <remarks>Only handles data and a FileStream, 
-    /// use dbcFile to handle the file</remarks></summary>
+    /// <remarks>Only handles data and a FileStream, use dbcFile to 
+    /// handle the file. Also need to receive materials name from 
+    /// Material.ini, when reading binary files</remarks></summary>
     class MeshFile
     {
         #region Constants
@@ -162,7 +163,8 @@ namespace HoMMol_core.IO
         }
 
         /// <summary>Load a Mesh file from a binary filestream
-        /// <remarks>Use first the constructor</remarks>
+        /// <remarks>Use first the constructor. After data read, 
+        /// it is needed to read materials names from Material.ini</remarks>
         /// </summary>
         /// <param name="amount">Amount of Models</param>
         /// <param name="fs">FileStream to read from</param>
@@ -220,6 +222,9 @@ namespace HoMMol_core.IO
         }
 
         /// <summary>Save a Mesh file to a binary filestream</summary>
+        /// <remarks> Before save data, it is needed to read Material.ini
+        /// and provide the material order number in the list for this
+        /// material name</remarks>
         /// <param name="fs">FileStream to write to</param>
         /// <returns>Amount of bytes written</returns>
         public UInt32 SaveBin(FileStream fs)
