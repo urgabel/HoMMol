@@ -97,7 +97,7 @@ namespace HoMMol_core.IO
                                     {
                                         Matr m = new Matr(line);
                                         if (hasComments) m.AddComments(Comments);
-                                        Data.Add(m.Id, m);
+                                        Data.Add(m.IdName, m);
                                         hasComments = false;
                                         Comments = String.Empty;
                                     }
@@ -126,7 +126,7 @@ namespace HoMMol_core.IO
                             {
                                 br.Read(buffer, 0, 52);
                                 Matr m = new Matr(buffer);
-                                Data.Add(m.Id, m);
+                                Data.Add(m.IdName, m);
                             }
                         }
                         break;
