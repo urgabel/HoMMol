@@ -44,7 +44,7 @@ namespace HoMMol_core.Graphics
         public UInt32 Amount = 0;      // Max should be 4
 
         /// <summary>Stores model parts</summary>
-        public List <ModelPart> Data = null;
+        public List <ModelPart> ModelParts = null;
 
         /// <summary>Comment lines in ini file</summary>
         String Comments = null;
@@ -55,7 +55,7 @@ namespace HoMMol_core.Graphics
         /// <remarks>Does not handle the file, just the data</remarks></summary>
         public Model()
         {
-            Data = new List <ModelPart>();
+            ModelParts = new List <ModelPart>();
         }
 
         /// <summary>New Model from byte array, as in dbc Mesh file
@@ -96,7 +96,7 @@ namespace HoMMol_core.Graphics
             }
             else
             {
-                Data = new List<ModelPart>();
+                ModelParts = new List<ModelPart>();
                 if (materials.Length < 16)
                 {
                     for (int i = 0; i < Amount; i++)
@@ -106,7 +106,7 @@ namespace HoMMol_core.Graphics
                 for (int i = 0; i < Amount; i++)
                 {
                     Buffer.BlockCopy(buffer, 1 * 16, b, 0, 16);
-                    Data.Add(new ModelPart(b, materials[i]));
+                    ModelParts.Add(new ModelPart(b, materials[i]));
                 }
             }
         }
@@ -154,16 +154,40 @@ namespace HoMMol_core.Graphics
             // Check if remaining lines are enough for the amount of parts
             if (str.Length - lineNumber < Amount * 7)
                 throw new ArgumentOutOfRangeException("str", "there are too few lines to read Model Parts, expected " + (7*Amount).ToString() + ", while remaining " + (str.Length - lineNumber).ToString());
-            Data = new List<ModelPart>();
+            ModelParts = new List<ModelPart>();
             for (int i = 0; i < Amount; i++)
             {
-                Data.Add(new ModelPart(str[lineNumber]));
+                ModelParts.Add(new ModelPart(str[lineNumber]));
                 lineNumber++;
             }
         }
         #endregion
 
         #region PublicMethods
+        /// <summary>Return "MESH"</summary>
+        public String Type()
+        {
+            return MAGIC_TYPE_TXT;
+        }
+
+        /// <summary>Check if provided instance has the same values, 
+        /// except comments</summary>
+        /// <param name="E">Model to compare</param>
+        public Boolean Equals(Model E)
+        {
+            if (E.Id != this.Id) return false;
+            if (E.Amount != this.Amount) return false;
+            if (! E.ModelParts.Equals(this.ModelParts)) return false;
+            return true;
+        }
+
+        /// <summary>Check if provided instance has the same Id</summary>
+        /// <param name="I">Model Id to compare</param>
+        public Boolean Equal_Id(UInt32 I)
+        {
+            return (I == this.Id);
+        }
+
         /// <summary>Add comments for this Model</summary>
         /// <param name="s">String like in ini comment lines</param>
         public void AddComments(String s)
@@ -178,11 +202,11 @@ namespace HoMMol_core.Graphics
         /// <returns>Return an array of bytes ready to save to a dbc file</returns>
         public Byte[] ToBytes()
         {
-            Byte[] b = new Byte[8 + 16 * Data.Count];
+            Byte[] b = new Byte[8 + 16 * ModelParts.Count];
             Buffer.BlockCopy(BitConverter.GetBytes(Id), 0, b, 0, 4);
             Buffer.BlockCopy(BitConverter.GetBytes(Amount), 0, b, 4, 4);
             int pos = 8;
-            foreach (ModelPart mp in Data)
+            foreach (ModelPart mp in ModelParts)
             {
                 Buffer.BlockCopy(mp.ToBytes(), 0, b, pos, 16);
                 pos += 16;
@@ -198,9 +222,9 @@ namespace HoMMol_core.Graphics
             if (!String.IsNullOrEmpty(Comments))
                 s += Comments + "\r\n";
             s += "[" + Id.ToString() + "]" + "\r\n";
-            s += "Part=" + Amount.ToString() + "\r\n";
+            s += "Part=" + Amount.ToString();
             for (int i = 0; i < Amount; i++)
-                s += Data[i].ToString() + "\r\n";
+                s +=  "\r\n" + ModelParts[i].ToString((UInt32)i);
             return s;
         }
         #endregion
