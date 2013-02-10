@@ -10,7 +10,7 @@ namespace HoMMol_core.Graphics
     {
         #region Properties
         /// <summary>Identifier name, can be in chinese</summary>
-        public String Id;
+        public String IdName;
 
         /// <summary>Diffuse color RGBA</summary>
         public D3DColor Diffuse;
@@ -35,7 +35,7 @@ namespace HoMMol_core.Graphics
         /// <summary>New default Material</summary>
         public Matr()
         {
-            Id = "default";
+            IdName = "default";
             Diffuse = new D3DColor(0xFFFFFFFF);
             Ambient = new D3DColor(0xFFFFFFFF);
             Specular = new D3DColor(0xFFFFFFFF);
@@ -52,10 +52,10 @@ namespace HoMMol_core.Graphics
         /// <param name="e">Emissive color</param>
         /// <param name="p">Power</param>
         /// <param name="c">Comments in ini file</param>
-        public Matr(String id, D3DColor d, D3DColor a, D3DColor s,
-            D3DColor e, float p, String c)
+        public Matr(String id, D3DColor d, D3DColor a, D3DColor s, D3DColor e, 
+            float p, String c)
         {
-            Id = id;
+            IdName = id;
             Diffuse = d;
             Ambient = a;
             Specular = s;
@@ -77,7 +77,7 @@ namespace HoMMol_core.Graphics
             if (!UInt32.TryParse(st[3], out s)) throw new ArgumentException("Incorrect Material format;  4th cannot be parsed to UInt32.");
             if (!UInt32.TryParse(st[4], out e)) throw new ArgumentException("Incorrect Material format;  5th cannot be parsed to UInt32.");
             if (!float.TryParse(st[5], out Power)) throw new ArgumentException("Incorrect Material format; 6th field cannot be parsed to Single IEEE float.");
-            Id = st[0];
+            IdName = st[0];
             Diffuse = new D3DColor(d);
             Ambient = new D3DColor(a);
             Specular = new D3DColor(s);
@@ -94,7 +94,7 @@ namespace HoMMol_core.Graphics
             Byte[] c = new Byte[4];
             Byte[] i = new Byte[32];
             Buffer.BlockCopy(b, 0, i, 0, 32);
-            Id = Common.Bytes32ToString(i);
+            IdName = Common.Bytes32ToString(i);
             Diffuse = new D3DColor(b[32], b[33], b[34], b[35]);
             Ambient = new D3DColor(b[36], b[37], b[38], b[39]);
             Specular = new D3DColor(b[40], b[41], b[42], b[43]);
@@ -126,17 +126,19 @@ namespace HoMMol_core.Graphics
                 c = Common.SplitLines(Comments);
                 s = String.Join("\r\n//", c);
             }
-            s += Id + " " + Diffuse.ToString() + " " + Ambient.ToString()
+            s += IdName + " " + Diffuse.ToString() + " " + Ambient.ToString()
                 + " " + Specular.ToString() + " " + Emissive.ToString()
                 + " " + Power.ToString();
             return s;
         }
 
+        // TODO: Fill the name with ending zeroes
         /// <summary>Get the material in a byte array</summary>
         /// <returns>a 52 bytes array, as stored in Matr dbc file</returns>
         public Byte[] ToBytes()
         {
             Byte[] b = new Byte[52];
+            Buffer.BlockCopy(Common.StringToBytes32(IdName), 0, b, 0, 32);
             Buffer.BlockCopy(Diffuse.ToBytes(),0,b,32,4);
             Buffer.BlockCopy(Ambient.ToBytes(), 0, b, 36, 4);
             Buffer.BlockCopy(Specular.ToBytes(), 0, b, 40, 4);
