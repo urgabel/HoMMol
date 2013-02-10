@@ -34,18 +34,18 @@ namespace HoMMol_core.Graphics
         #endregion
 
         #region Properties
-        /// <summary>Mesh</summary>
+        /// <summary>MeshId</summary>
         /// <value>Mesh Id, in 3DObj.ini</value>
-        public UInt32 Mesh;     // Mesh Id
+        public UInt32 MeshId;     // Mesh Id
 
-        /// <summary>Texture</summary>
+        /// <summary>TextureId</summary>
         /// <value>Texture Id, in 3DTexture.ini</value>
-        public UInt32 Texture;  // Texture Id
+        public UInt32 TextureId;  // Texture Id
 
-        /// <summary>MixTex</summary>
+        /// <summary>MixTexId</summary>
         /// <value>Secondary Texture Id to mix, in 3DTexture.ini, 
         /// when using more than one</value>
-        public UInt32 MixTex;   // Texture Id to mix, when using more than one
+        public UInt32 MixTexId;   // Texture Id to mix, when using more than one
 
         /// <summary>MixOpt</summary>
         /// <value>Mixing options, 
@@ -76,9 +76,9 @@ namespace HoMMol_core.Graphics
         /// <summary>New default empty Model Part</summary>
         public ModelPart()
         {
-            Mesh = 0;
-            Texture = 0;
-            MixTex = 0;
+            MeshId = 0;
+            TextureId = 0;
+            MixTexId = 0;
             MixOpt = 0;
             Asb = 5;
             Adb = 6;
@@ -99,9 +99,9 @@ namespace HoMMol_core.Graphics
         public ModelPart(UInt32 M, UInt32 T, UInt32 MT, Byte MO, 
             Byte As, Byte Ad, String Mat)
         {
-            Mesh = M;
-            Texture = T;
-            MixTex = MT;
+            MeshId = M;
+            TextureId = T;
+            MixTexId = MT;
             MixOpt = MO;
             Asb = As;
             Adb = Ad;
@@ -138,9 +138,9 @@ namespace HoMMol_core.Graphics
             }
             else
             {
-                Mesh = BitConverter.ToUInt32(buffer, 0);
-                Texture = BitConverter.ToUInt32(buffer, 4);
-                MixTex = BitConverter.ToUInt32(buffer, 8);
+                MeshId = BitConverter.ToUInt32(buffer, 0);
+                TextureId = BitConverter.ToUInt32(buffer, 4);
+                MixTexId = BitConverter.ToUInt32(buffer, 8);
                 MixOpt = buffer[12];
                 Asb = buffer[13];
                 Adb = buffer[14];
@@ -167,9 +167,9 @@ namespace HoMMol_core.Graphics
         {
             if (str.Length < 7)
                 throw new ArgumentOutOfRangeException("str", "there are too few lines; expected 7, found " + str.Length.ToString());
-            Mesh = UInt32.Parse(str[0].Split('=')[1]);
-            Texture = UInt32.Parse(str[1].Split('=')[1]);
-            MixTex = UInt32.Parse(str[2].Split('=')[1]);
+            MeshId = UInt32.Parse(str[0].Split('=')[1]);
+            TextureId = UInt32.Parse(str[1].Split('=')[1]);
+            MixTexId = UInt32.Parse(str[2].Split('=')[1]);
             MixOpt= Byte.Parse(str[3].Split('=')[1]);
             Asb = Byte.Parse(str[4].Split('=')[1]);
             Adb = Byte.Parse(str[5].Split('=')[1]);
@@ -190,9 +190,9 @@ namespace HoMMol_core.Graphics
         /// <returns>Return true if same values</returns>
         public Boolean Equals(ModelPart M)
         {
-            if ((M.Mesh != this.Mesh)) return false;
-            if ((M.Texture != this.Texture)) return false;
-            if ((M.MixTex != this.MixTex)) return false;
+            if ((M.MeshId != this.MeshId)) return false;
+            if ((M.TextureId != this.TextureId)) return false;
+            if ((M.MixTexId != this.MixTexId)) return false;
             if ((M.MixOpt != this.MixOpt)) return false;
             if ((M.Asb != this.Asb)) return false;
             if ((M.Adb != this.Adb)) return false;
@@ -215,12 +215,12 @@ namespace HoMMol_core.Graphics
         {
             String s = "";
             String index = i.ToString();     // By default is 0
-            s += "Mesh" + index + "=" + Mesh + "\r\n";
-            s += "Texture" + index + "=" + Texture + "\r\n";
-            s += "MixTex" + index + "=" + MixTex + "\r\n";
-            s += "MixOpt" + index + "=" + MixOpt + "\r\n";
-            s += "Asb" + index + "=" + Asb + "\r\n";
-            s += "Adb" + index + "=" + Adb + "\r\n";
+            s += "Mesh" + index + "=" + MeshId.ToString() + "\r\n";
+            s += "Texture" + index + "=" + TextureId.ToString() + "\r\n";
+            s += "MixTex" + index + "=" + MixTexId.ToString() + "\r\n";
+            s += "MixOpt" + index + "=" + MixOpt.ToString() + "\r\n";
+            s += "Asb" + index + "=" + Asb.ToString() + "\r\n";
+            s += "Adb" + index + "=" + Adb.ToString() + "\r\n";
             s += "Material" + index + "=" + Material;
             return s;
         }
@@ -248,9 +248,9 @@ namespace HoMMol_core.Graphics
         public Byte[] ToBytes(Byte material)
         {
             Byte[] b = new Byte[16];
-            Buffer.BlockCopy(BitConverter.GetBytes(Mesh), 0, b, 0, 4);
-            Buffer.BlockCopy(BitConverter.GetBytes(Texture), 0, b, 4, 4);
-            Buffer.BlockCopy(BitConverter.GetBytes(MixTex), 0, b, 8, 4);
+            Buffer.BlockCopy(BitConverter.GetBytes(MeshId), 0, b, 0, 4);
+            Buffer.BlockCopy(BitConverter.GetBytes(TextureId), 0, b, 4, 4);
+            Buffer.BlockCopy(BitConverter.GetBytes(MixTexId), 0, b, 8, 4);
             Buffer.BlockCopy(BitConverter.GetBytes(MixOpt), 0, b, 12, 1);
             Buffer.BlockCopy(BitConverter.GetBytes(Asb), 0, b, 13, 1);
             Buffer.BlockCopy(BitConverter.GetBytes(Adb), 0, b, 14, 1);
